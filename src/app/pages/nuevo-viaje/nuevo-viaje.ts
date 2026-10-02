@@ -1,5 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { ViajesService } from '../../services/viajes-service';
 
 @Component({
   imports: [ReactiveFormsModule], // Angular 17+ ya reconoce @if y @for de forma nativa aquí
@@ -8,7 +10,10 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
   templateUrl: './nuevo-viaje.html',
 })
 export class NuevoViaje {
+  private readonly viajesService = inject(ViajesService);
+  private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
+  
   protected showModal = signal(false);
 
   form = this.fb.group({
@@ -21,7 +26,15 @@ export class NuevoViaje {
 
   crearViaje() {
     if (this.form.valid) {
+      this.viajesService.crearViaje({
+        destino: this.form.value.destino!,
+        descripcion: this.form.value.descripcion!,
+        fecha: this.form.value.fecha!,
+        dias: this.form.value.dias!,
+        imagenUrl: this.form.value.imagen!,
+      });
       this.showModal.set(true);
+      this.router.navigate(['/']);
     } else {
       this.form.markAllAsTouched();
     }
