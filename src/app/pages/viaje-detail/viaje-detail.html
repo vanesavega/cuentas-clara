@@ -1,0 +1,96 @@
+@if (viaje(); as v) {
+  <div class="max-w-4xl mx-auto p-4 md:p-6 space-y-6">
+
+    <!-- Volver -->
+    <button routerLink=".." class="inline-flex items-center gap-2 text-sm font-medium text-body hover:text-heading">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12l4-4m-4 4 4 4"/></svg>
+      Volver a mis viajes
+    </button>
+
+    <!-- Cabecera del viaje -->
+    <div class="bg-neutral-primary-soft border border-default rounded-base shadow-xs overflow-hidden">
+      @if (v.imagenUrl) {
+        <img [src]="v.imagenUrl" [alt]="v.destino" class="w-full h-56 object-cover" />
+      } @else {
+        <div class="w-full h-56 bg-gradient-to-br from-blue-500 to-teal-400"></div>
+      }
+      <div class="p-6">
+        <h1 class="text-3xl font-bold tracking-tight text-heading">{{ v.destino }}</h1>
+        <div class="flex flex-wrap gap-2 mt-3">
+          <span class="bg-brand-softer text-fg-brand-strong text-xs font-medium px-2.5 py-1 rounded-base">
+            📅 {{ v.fecha | date: 'dd/MM/yyyy' }}
+          </span>
+          <span class="bg-brand-softer text-fg-brand-strong text-xs font-medium px-2.5 py-1 rounded-base">
+            🕒 {{ v.dias }} días
+          </span>
+        </div>
+        @if (v.descripcion) {
+          <p class="mt-4 text-body">{{ v.descripcion }}</p>
+        }
+      </div>
+    </div>
+
+    <!-- Personas del viaje -->
+    <div class="bg-neutral-primary-soft border border-default rounded-base shadow-xs p-6">
+      <h2 class="text-xl font-semibold text-heading mb-4">¿Quiénes van?</h2>
+      <ul class="divide-y divide-default">
+        @for (persona of personas(); track persona.id) {
+          <li class="flex items-center gap-3 py-3">
+            <div class="w-9 h-9 flex items-center justify-center rounded-full bg-brand-softer text-fg-brand-strong font-semibold">
+              {{ persona.nombre[0] }}
+            </div>
+            <span class="text-heading">{{ persona.nombre }} {{ persona.apellido }}</span>
+          </li>
+        } @empty {
+          <li class="py-3 text-body">Todavía no hay nadie en este viaje.</li>
+        }
+      </ul>
+    </div>
+
+    <div class="grid gap-6 md:grid-cols-2">
+      <!-- Agregar personas existentes -->
+      <div class="bg-neutral-primary-soft border border-default rounded-base shadow-xs p-6">
+        <h3 class="text-lg font-semibold text-heading mb-4">Agregar personas existentes</h3>
+        @for (persona of disponibles(); track persona.id) {
+          <div class="flex items-center mb-3">
+            <input [id]="persona.id" type="checkbox" (change)="alternarSeleccion(persona.id)"
+              class="w-4 h-4 border border-default-medium rounded-xs bg-neutral-secondary-medium focus:ring-2 focus:ring-brand-soft" />
+            <label [for]="persona.id" class="ms-2 text-sm font-medium text-heading">{{ persona.nombre }} {{ persona.apellido }}</label>
+          </div>
+        } @empty {
+          <p class="text-sm text-body">No hay más personas registradas.</p>
+        }
+        @if (disponibles().length > 0) {
+          <button type="button" (click)="agregarSeleccionadas()"
+            class="mt-2 text-white bg-brand hover:bg-brand-strong focus:ring-4 focus:ring-brand-medium font-medium rounded-base text-sm px-4 py-2.5">
+            Agregar al viaje
+          </button>
+        }
+      </div>
+
+      <!-- Crear persona nueva -->
+      <form [formGroup]="nuevaPersonaForm" (ngSubmit)="crearYAgregar()"
+        class="bg-neutral-primary-soft border border-default rounded-base shadow-xs p-6">
+        <h3 class="text-lg font-semibold text-heading mb-4">Persona nueva</h3>
+        <input formControlName="nombre" type="text" placeholder="Nombre"
+          class="mb-3 bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow-xs placeholder:text-body" />
+        <input formControlName="apellido" type="text" placeholder="Apellido"
+          class="mb-4 bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow-xs placeholder:text-body" />
+        <button type="submit" [disabled]="nuevaPersonaForm.invalid"
+          class="text-white bg-brand hover:bg-brand-strong focus:ring-4 focus:ring-brand-medium font-medium rounded-base text-sm px-4 py-2.5 disabled:opacity-50">
+          Crear y agregar
+        </button>
+      </form>
+    </div>
+  </div>
+} @else {
+  <!-- Viaje no encontrado -->
+  <div class="max-w-md mx-auto mt-16 text-center bg-neutral-primary-soft border border-default rounded-base shadow-xs p-8">
+    <p class="text-5xl mb-4">🧭</p>
+    <h1 class="text-2xl font-semibold text-heading">Viaje no encontrado</h1>
+    <p class="mt-2 text-body">Puede que el enlace esté mal o que el viaje ya no exista.</p>
+    <button routerLink=".." class="mt-6 text-white bg-brand hover:bg-brand-strong font-medium rounded-base text-sm px-4 py-2.5">
+      Ver mis viajes
+    </button>
+  </div>
+}

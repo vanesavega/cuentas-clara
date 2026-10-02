@@ -36,4 +36,18 @@ export class ViajesService {
         this._personas.update(personas => [...personas, personaConId]);
         return nuevoId;
     }
+
+    getViajeById(id: string): Viaje | undefined {
+        return this._viajes().find(viaje => viaje.id === id);
+    }
+
+    getParticipantesByViajeId(viajeId: string): Persona[] {
+        const participantesIds = this._participaciones().filter(p => p.viajeId === viajeId).map(p => p.personaId);
+        return this._personas().filter(persona => participantesIds.includes(persona.id));
+    }
+
+    getParticipantesDisponibles(viajeId: string): Persona[] {
+        const participantesIds = this._participaciones().filter(p => p.viajeId === viajeId).map(p => p.personaId);
+        return this._personas().filter(persona => !participantesIds.includes(persona.id));
+    }
 }

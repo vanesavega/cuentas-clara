@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { Viaje } from '../../models/viaje';
 @Component({
   imports: [],
@@ -8,4 +8,5 @@ import { Viaje } from '../../models/viaje';
 })
 export class CardViaje {
   viaje = input.required<Viaje>();
+  verMasbtn = output<string>();
 }
