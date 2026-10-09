@@ -1,11 +1,15 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { ViajesService } from './../../services/viajes-service';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
+import { DatePipe, DecimalPipe } from '@angular/common';
+import { GastosService } from '../../services/gastos-service';
+import { GastoForm } from '../../components/gasto-form/gasto-form';
+import { NuevoGasto } from '../../models/gasto';
+
 @Component({
-  imports: [ReactiveFormsModule, DatePipe, RouterLink],
+  imports: [ReactiveFormsModule, DatePipe, DecimalPipe, RouterLink, GastoForm],
   selector: 'app-viaje-detail',
   styleUrl: './viaje-detail.css',
   templateUrl: './viaje-detail.html',
@@ -13,6 +17,8 @@ import { RouterLink } from '@angular/router';
 export class ViajeDetail {
   viajeservice = inject(ViajesService);
   private readonly fb = inject(FormBuilder);
+  private readonly gastosService = inject(GastosService);
+  gastos = computed(() => this.gastosService.gastosDeViaje(this.id()));
 
   id = input.required<string>();
   viaje = computed(() => {
@@ -56,6 +62,10 @@ export class ViajeDetail {
       this.viajeservice.agregarParticipantes(this.id(), [personaId]);
       this.nuevaPersonaForm.reset();
     }
+  }
+
+  agregarGasto(nuevo: NuevoGasto) {
+    this.gastosService.agregar(this.id(), nuevo);
   }
 
 }

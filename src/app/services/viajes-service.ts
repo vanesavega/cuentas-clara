@@ -50,4 +50,5 @@ export class ViajesService {
         const participantesIds = this._participaciones().filter(p => p.viajeId === viajeId).map(p => p.personaId);
         return this._personas().filter(persona => !participantesIds.includes(persona.id));
     }
+
 }

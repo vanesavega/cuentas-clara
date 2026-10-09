@@ -1,0 +1,94 @@
+<form [formGroup]="form" (ngSubmit)="enviar()" class="space-y-4">
+
+  <div>
+    <label for="descripcion" class="block mb-2.5 text-sm font-medium text-heading">Descripción</label>
+    <input id="descripcion" type="text" formControlName="descripcion" class="campo" placeholder="Ej: Cena del sábado" />
+    @if (form.controls.descripcion.touched && form.controls.descripcion.errors?.['required']) {
+      <p class="mt-1 text-sm text-red-600">La descripción es obligatoria.</p>
+    }
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <label for="monto" class="block mb-2.5 text-sm font-medium text-heading">Monto ($)</label>
+      <input id="monto" type="number" formControlName="monto" min="1" step="1" class="campo" />
+      @if (form.controls.monto.touched && form.controls.monto.invalid) {
+        <p class="mt-1 text-sm text-red-600">Escribe un monto mayor a 0.</p>
+      }
+    </div>
+    <div>
+      <label for="fecha" class="block mb-2.5 text-sm font-medium text-heading">Fecha</label>
+      <input id="fecha" type="date" formControlName="fecha" class="campo" />
+    </div>
+  </div>
+
+  <div>
+    <label for="pagador" class="block mb-2.5 text-sm font-medium text-heading">¿Quién pagó?</label>
+    <select id="pagador" formControlName="pagadorId" class="campo">
+      <option value="" disabled>Selecciona…</option>
+      @for (persona of personas(); track persona.id) {
+        <option [value]="persona.id">{{ persona.nombre }} {{ persona.apellido }}</option>
+      }
+    </select>
+    @if (form.controls.pagadorId.touched && form.controls.pagadorId.errors?.['required']) {
+      <p class="mt-1 text-sm text-red-600">Elige quién pagó.</p>
+    }
+  </div>
+
+  <fieldset class="flex flex-wrap gap-4">
+    <legend class="mb-2.5 text-sm font-medium text-heading">¿Cómo se reparte?</legend>
+    <label class="flex items-center gap-2 text-sm text-heading">
+      <input type="radio" formControlName="modo" value="iguales" /> Partes iguales
+    </label>
+    <label class="flex items-center gap-2 text-sm text-heading">
+      <input type="radio" formControlName="modo" value="porcentajes" /> Porcentajes
+    </label>
+    <label class="flex items-center gap-2 text-sm text-heading">
+      <input type="radio" formControlName="modo" value="montos" /> Montos exactos
+    </label>
+  </fieldset>
+
+  @switch (modo()) {
+    @case ('iguales') {
+      <div formArrayName="iguales" class="space-y-2">
+        @for (fila of form.controls.iguales.controls; track fila.controls.personaId.value; let i = $index) {
+          <label [formGroupName]="i" class="flex items-center gap-2 text-sm text-heading">
+            <input type="checkbox" formControlName="participa" />
+            {{ fila.controls.nombre.value }}
+          </label>
+        }
+      </div>
+    }
+    @case ('porcentajes') {
+      <div formArrayName="porcentajes" class="space-y-2">
+        @for (fila of form.controls.porcentajes.controls; track fila.controls.personaId.value; let i = $index) {
+          <div [formGroupName]="i" class="flex items-center gap-2">
+            <span class="w-40 text-sm text-heading">{{ fila.controls.nombre.value }}</span>
+            <input type="number" formControlName="porcentaje" min="0" max="100" class="campo !w-24" />
+            <span class="text-sm text-body">%</span>
+          </div>
+        }
+      </div>
+    }
+    @case ('montos') {
+      <div formArrayName="montos" class="space-y-2">
+        @for (fila of form.controls.montos.controls; track fila.controls.personaId.value; let i = $index) {
+          <div [formGroupName]="i" class="flex items-center gap-2">
+            <span class="w-40 text-sm text-heading">{{ fila.controls.nombre.value }}</span>
+            <span class="text-sm text-body">$</span>
+            <input type="number" formControlName="monto" min="0" step="1" class="campo !w-32" />
+          </div>
+        }
+      </div>
+    }
+  }
+
+  @if (personas().length === 0) {
+    <p class="text-sm text-body">Agrega personas al viaje antes de registrar gastos.</p>
+  }
+
+  <button type="submit" [disabled]="personas().length === 0"
+    class="text-white bg-brand hover:bg-brand-strong focus:ring-4 focus:ring-brand-medium font-medium rounded-base text-sm px-4 py-2.5 disabled:opacity-50">
+    Guardar gasto
+  </button>
+</form>

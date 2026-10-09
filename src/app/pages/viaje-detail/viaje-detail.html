@@ -47,6 +47,29 @@
       </ul>
     </div>
 
+    <!-- Gastos -->
+    <div class="bg-neutral-primary-soft border border-default rounded-base shadow-xs p-6">
+      <h2 class="text-xl font-semibold text-heading mb-4">Nuevo gasto</h2>
+      <app-gasto-form [personas]="personas()" (guardar)="agregarGasto($event)" />
+    </div>
+
+    <div class="bg-neutral-primary-soft border border-default rounded-base shadow-xs p-6">
+      <h2 class="text-xl font-semibold text-heading mb-4">Gastos del viaje</h2>
+      <ul class="divide-y divide-default">
+        @for (gasto of gastos(); track gasto.id) {
+          <li class="flex items-center justify-between py-3">
+            <div>
+              <p class="text-heading">{{ gasto.descripcion }}</p>
+              <p class="text-xs text-body">{{ gasto.fecha }} · reparto: {{ gasto.reparto.modo }}</p>
+            </div>
+            <span class="font-semibold text-heading">$ {{ gasto.monto | number }}</span>
+          </li>
+        } @empty {
+          <li class="py-3 text-body">Todavía no hay gastos.</li>
+        }
+      </ul>
+    </div>
+
     <div class="grid gap-6 md:grid-cols-2">
       <!-- Agregar personas existentes -->
       <div class="bg-neutral-primary-soft border border-default rounded-base shadow-xs p-6">
