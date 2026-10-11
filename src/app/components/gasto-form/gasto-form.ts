@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, inject, input, output, untracked } from '@angular/core';
+import { Component, effect, inject, input, output } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormArray, FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Persona } from '../../models/persona';
@@ -12,7 +12,6 @@ type FilaMonto = FormGroup<{ personaId: FormControl<string>; nombre: FormControl
 @Component({
   imports: [ReactiveFormsModule],
   selector: 'app-gasto-form',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './gasto-form.html',
 })
 export class GastoForm {
@@ -23,7 +22,7 @@ export class GastoForm {
 
   protected readonly form = this.fb.group({
     descripcion: ['', [Validators.required, Validators.maxLength(80)]],
-    monto: [0, [Validators.required, Validators.min(1)]],
+    monto: [0, [Validators.required, Validators.min(1), Validators.pattern(/^\d+$/)]],
     fecha: [new Date().toLocaleDateString('en-CA'), Validators.required],
     pagadorId: ['', Validators.required],
     modo: this.fb.control<ModoReparto>('iguales'),
@@ -39,11 +38,9 @@ export class GastoForm {
   constructor() {
     effect(() => {
       const personas = this.personas();
-      untracked(() => {
-        this.sincronizar(this.form.controls.iguales, personas, p => this.crearFilaIgual(p));
-        this.sincronizar(this.form.controls.porcentajes, personas, p => this.crearFilaPorcentaje(p));
-        this.sincronizar(this.form.controls.montos, personas, p => this.crearFilaMonto(p));
-      });
+      this.sincronizar(this.form.controls.iguales, personas, p => this.crearFilaIgual(p));
+      this.sincronizar(this.form.controls.porcentajes, personas, p => this.crearFilaPorcentaje(p));
+      this.sincronizar(this.form.controls.montos, personas, p => this.crearFilaMonto(p));
     });
   }
 
@@ -54,7 +51,7 @@ export class GastoForm {
     return this.fb.group({ personaId: [p.id], nombre: [`${p.nombre} ${p.apellido}`], porcentaje: [0] });
   }
   private crearFilaMonto(p: Persona): FilaMonto {
-    return this.fb.group({ personaId: [p.id], nombre: [`${p.nombre} ${p.apellido}`], monto: [0] });
+    return this.fb.group({ personaId: [p.id], nombre: [`${p.nombre} ${p.apellido}`], monto: [0, Validators.pattern(/^\d+$/)] });
   }
 
   private sincronizar(

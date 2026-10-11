@@ -13,7 +13,7 @@
       <label for="monto" class="block mb-2.5 text-sm font-medium text-heading">Monto ($)</label>
       <input id="monto" type="number" formControlName="monto" min="1" step="1" class="campo" />
       @if (form.controls.monto.touched && form.controls.monto.invalid) {
-        <p class="mt-1 text-sm text-red-600">Escribe un monto mayor a 0.</p>
+        <p class="mt-1 text-sm text-red-600">Escribe un monto entero (sin decimales) mayor a 0.</p>
       }
     </div>
     <div>
